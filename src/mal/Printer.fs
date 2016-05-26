@@ -27,6 +27,15 @@ module Printer
                 pr_func "func" tag
             | Macro(_, tag, _, _, _, _) -> pr_func "macro" tag
             | Atom(tag, r) -> pr_atom tag !r
+            | ReplCmd cmd -> pr_replCmd cmd
+
+        and pr_replCmd cmd =
+            match cmd with
+            | "q"
+            | "quit"
+            | "exit" -> exit 0
+            | "help" -> appendStr "Help message coming soon"
+            | _ -> appendStr ("REPL command not recognized: " + cmd)
 
         and pr separator prefix node =
             appendStr prefix

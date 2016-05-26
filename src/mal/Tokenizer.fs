@@ -7,13 +7,14 @@ module Tokenizer
         | OpenBracket | CloseBracket
         | OpenBrace | CloseBrace
         | OpenParen | CloseParen
+        | Semicolon
         | SingleQuote
         | Backtick
         | Tilde | SpliceUnquote
         | Caret
         | At
         | String of string
-        | Token of string
+        | Identifier of string
         | Keyword of string
         | Number of string
 
@@ -24,7 +25,7 @@ module Tokenizer
         let inline isWhiteSpace ch = ch = ',' || Char.IsWhiteSpace(ch)
         let inline isNotNewline ch = ch <> '\r' && ch <> '\n'
         let inline isDigit ch = Char.IsDigit(ch)
-        let inline isTokenChar ch =
+        let inline isIdentifierChar ch =
             match ch with
             | '[' | ']' | '{' | '}' | '(' | ')'
             | '\'' | '"' | '`' | ',' | '#' -> false
@@ -72,7 +73,7 @@ module Tokenizer
         let accumulateKeyword p =
             let n = p + 1
             if p >= len then raise <| Error.expectedXButEOF "keyword"
-            elif isTokenChar str.[p] then accumulateWhile isTokenChar Keyword p n
+            elif isIdentifierChar str.[p] then accumulateWhile isIdentifierChar Keyword p n
             else raise <| Error.expectedX "keyword char"
 
         let accumulateSpliceUnquote p =
@@ -88,6 +89,7 @@ module Tokenizer
                 match str.[p] with
                 | ch when isWhiteSpace ch -> getToken n
                 | '#' -> skipWhile isNotNewline n |> getToken
+                | ';' -> Semicolon, n
                 | '[' -> OpenBracket, n
                 | ']' -> CloseBracket, n
                 | '{' -> OpenBrace, n
@@ -103,7 +105,7 @@ module Tokenizer
                 | ':' -> accumulateKeyword n
                 | '-' when isDigit str.[n] -> accumulateWhile isDigit Number p n
                 | ch when isDigit ch -> accumulateWhile isDigit Number p n
-                | ch when isTokenChar ch -> accumulateWhile isTokenChar Token p n
+                | ch when isIdentifierChar ch -> accumulateWhile isIdentifierChar Identifier p n
                 | _ -> raise <| Error.unexpectedChar ()
 
         let rec accumulate acc p = 

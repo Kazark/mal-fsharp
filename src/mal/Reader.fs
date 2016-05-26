@@ -18,6 +18,7 @@ module Reader
         | OpenParen::rest -> readList [] rest
         | OpenBracket::rest -> readVector (MutableList()) rest
         | OpenBrace::rest -> readMap [] rest
+        | Semicolon::rest -> readReplCmd rest
         | SingleQuote::rest -> wrapForm quote rest
         | Backtick::rest -> wrapForm quasiquote rest
         | Tilde::rest -> wrapForm unquote rest
@@ -25,6 +26,11 @@ module Reader
         | At::rest -> wrapForm deref rest
         | Caret::rest -> readMeta rest
         | tokens -> readAtom tokens
+
+    and readReplCmd tokens =
+        match tokens with
+        | Identifier(string) :: _ -> Some(ReplCmd string), []
+        | _ -> failwith "Unable to parse REPL command"
 
     and wrapForm node tokens = 
         match readForm tokens with
@@ -67,13 +73,13 @@ module Reader
         | _ -> raise <| Error.expectedXButEOF "map"
 
     and readAtom = function
-        | Token("nil")::rest -> Node.SomeNIL, rest
-        | Token("true")::rest -> Node.SomeTRUE, rest
-        | Token("false")::rest -> Node.SomeFALSE, rest
+        | Identifier("nil")::rest -> Node.SomeNIL, rest
+        | Identifier("true")::rest -> Node.SomeTRUE, rest
+        | Identifier("false")::rest -> Node.SomeFALSE, rest
         | Tokenizer.String(str)::rest -> Some(String(str)), rest
         | Tokenizer.Keyword(kw)::rest -> Some(Keyword(kw)), rest
         | Tokenizer.Number(num)::rest -> Some(Number(Int64.Parse(num))), rest
-        | Token(sym)::rest -> Some(Symbol(sym)), rest
+        | Identifier(sym)::rest -> Some(Symbol(sym)), rest
         | [] -> None, []
         | _ -> raise <| Error.invalidToken ()
         

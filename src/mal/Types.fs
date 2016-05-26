@@ -15,6 +15,7 @@ module Types
         | Func of Metadata * int * (Node list -> Node) * Node * Node list * EnvChain
         | Macro of Metadata * int * (Node list -> Node) * Node * Node list * EnvChain
         | Atom of int * Node Ref
+        | ReplCmd of string
 
         static member private hashSeq (s : seq<Node>) =
             let iter st node = (st * 397) ^^^ node.GetHashCode()
@@ -51,18 +52,19 @@ module Types
         static member private rank x =
             match x with
             | Nil -> 0
-            | List(_, _) -> 1
-            | Vector(_, _) -> 2
-            | Map(_, _) -> 3
-            | Symbol(_) -> 4
-            | Keyword(_) -> 5
-            | Number(_) -> 6
-            | String(_) -> 7
-            | Bool(_) -> 8
-            | BuiltInFunc(_, _, _)
-            | Func(_, _, _, _, _, _)
-            | Macro(_, _, _, _, _, _) -> 9
-            | Atom(_, _) -> 10
+            | List _ -> 1
+            | Vector _ -> 2
+            | Map _ -> 3
+            | Symbol _ -> 4
+            | Keyword _ -> 5
+            | Number _ -> 6
+            | String _ -> 7
+            | Bool _ -> 8
+            | BuiltInFunc _
+            | Func _
+            | Macro _ -> 9
+            | Atom _ -> 10
+            | ReplCmd _ -> 11
 
         static member private equals x y =
             match x, y with
@@ -121,6 +123,7 @@ module Types
             | BuiltInFunc(_, tag, _) | Func(_, tag, _, _, _, _) | Macro(_, tag, _, _, _, _) ->
                 hash tag
             | Atom(tag, _) -> hash tag
+            | ReplCmd x -> hash (";" + x)
 
         interface System.IComparable with
             member x.CompareTo yobj =
