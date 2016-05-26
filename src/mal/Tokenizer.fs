@@ -1,7 +1,6 @@
 module Tokenizer
 
     open System
-    open Types
     
     type Token =
         | EOF
@@ -28,7 +27,7 @@ module Tokenizer
         let inline isTokenChar ch =
             match ch with
             | '[' | ']' | '{' | '}' | '(' | ')'
-            | '\'' | '"' | '`' | ',' | ';' -> false
+            | '\'' | '"' | '`' | ',' | '#' -> false
             | ch when Char.IsWhiteSpace(ch) -> false
             | _ -> true
        
@@ -88,7 +87,7 @@ module Tokenizer
                 let n = p + 1
                 match str.[p] with
                 | ch when isWhiteSpace ch -> getToken n
-                | ';' -> skipWhile isNotNewline n |> getToken
+                | '#' -> skipWhile isNotNewline n |> getToken
                 | '[' -> OpenBracket, n
                 | ']' -> CloseBracket, n
                 | '{' -> OpenBrace, n
@@ -109,7 +108,7 @@ module Tokenizer
 
         let rec accumulate acc p = 
             match getToken p with
-            | EOF, p -> List.rev acc
+            | EOF, _ -> List.rev acc
             | tok, p -> accumulate (tok::acc) p
 
         accumulate [] 0
