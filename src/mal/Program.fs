@@ -12,6 +12,7 @@ let rec main args =
     | _ ->
         stdout.WriteLine Printer.welcome
         stdout.WriteLine Printer.asciiArt
+        stdout.WriteLine()
         let rec loop () =
             match Readline.read "mal> " mode with
             | null -> 0
