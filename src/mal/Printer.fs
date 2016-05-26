@@ -34,7 +34,17 @@ module Printer
             | "q"
             | "quit"
             | "exit" -> exit 0
-            | "help" -> appendStr "Help message coming soon"
+            | "?"
+            | "h"
+            | "help" -> appendStr """Welcome to the F# MAL (Make-A-Lisp) REPL!
+This help message is a work in progress.
+Core Language:
+    TODO
+Functions:
+    TODO
+REPL Commands:
+    Use ;quit or ;q or ;exit to quit the REPL.
+    Use ;help or ;? or ;h to show this message."""
             | _ -> appendStr ("REPL command not recognized: " + cmd)
 
         and pr separator prefix node =
