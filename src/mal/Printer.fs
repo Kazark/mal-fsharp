@@ -2,6 +2,16 @@ module Printer
     open System.Text
     open Types
 
+    let welcome = "Welcome to the F# MAL (Make-A-Lisp) REPL!"
+
+    let asciiArt = """
+          ,--. ,--.                                  
+,------.,-|  |-|  |-.    ,--.   ,--.  ,---.  ,--.    
+|  .---''-|  |-|  |-'    |   `.'   | /  O  \ |  |    
+|  `--, ,-|  |-|  |-.    |  |'.'|  ||  .-.  ||  |    
+|  |`   '-|  |-|  |-'    |  |   |  ||  | |  ||  '--. 
+`--'      `--' `--'      `--'   `--'`--' `--'`-----'"""                                                     
+
     type Profile = { Pretty : bool; Separator : string }
     let pr_str_profile = { Pretty = true; Separator = " " }
     let str_profile = { Pretty = false; Separator = "" }
@@ -36,15 +46,7 @@ module Printer
             | "exit" -> exit 0
             | "?"
             | "h"
-            | "help" -> appendStr """Welcome to the F# MAL (Make-A-Lisp) REPL!
-This help message is a work in progress.
-Core Language:
-    TODO
-Functions:
-    TODO
-REPL Commands:
-    Use ;quit or ;q or ;exit to quit the REPL.
-    Use ;help or ;? or ;h to show this message."""
+            | "help" -> sprintf "\n%s\n%s\n%s" welcome asciiArt Help.message |> appendStr
             | _ -> appendStr ("REPL command not recognized: " + cmd)
 
         and pr separator prefix node =

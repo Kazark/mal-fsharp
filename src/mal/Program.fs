@@ -10,9 +10,10 @@ let rec main args =
         |> REPL.RE env |> Seq.iter ignore
         0
     | _ ->
-        REPL.RE env "(println (str \"Mal [\" *host-language* \"]\"))" |> Seq.iter ignore
+        stdout.WriteLine Printer.welcome
+        stdout.WriteLine Printer.asciiArt
         let rec loop () =
-            match Readline.read "user> " mode with
+            match Readline.read "mal> " mode with
             | null -> 0
             | input ->
                 REPL.REP env input
